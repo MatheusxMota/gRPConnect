@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+
+option csharp_namespace = "Chat.Contracts";
+
+package chat;
+
+service ChatService {
+  // Stream bidirecional: cliente envia mensagens e comandos,
+  // servidor envia mensagens de volta (broadcast, respostas, etc)
+  rpc Connect (stream ClientMessage) returns (stream ServerMessage);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string room = 3;
+}
+
+message ChatMessage {
+  string id = 1;
+  User sender = 2;
+  string room = 3;
+  string content = 4;
+  int64 timestamp = 5;
+}
+
+message Room {
+  string name = 1;
+  int32 user_count = 2;
+}
+
+message ClientMessage {
+  oneof payload {
+    JoinRequest join = 1;
+    ChatMessage chat_message = 2;
+  }
+}
+
+message JoinRequest {
+  string name = 1;
+  string room = 2;
+}
+
+message ServerMessage {
+  oneof payload {
+    ChatMessage chat_message = 1;
+    SystemNotification notification = 2;
+  }
+}
+
+message SystemNotification {
+  string text = 1;
+  int64 timestamp = 2;
+}
